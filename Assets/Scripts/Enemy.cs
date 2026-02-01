@@ -18,21 +18,21 @@ public class Enemy : MonoBehaviour
     
     private Transform player;
     private Rigidbody2D rb;
-    private int currentWaypointIndex = 0;
-    private int direction = 1; // 1 = forward, -1 = backward
-    private float lastDamageTime;
+    private int _currentWaypointIndex = 0;
+    private int _direction = 1; // 1 = forward, -1 = backward
+    private float _lastDamageTime;
     
     // Behavior states - set by player's mask system
     public enum BehaviorState { Patrol, Chase, Repel }
     public BehaviorState currentBehavior = BehaviorState.Patrol;
-    
-    void Start()
+
+    private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
-    
-    void FixedUpdate()
+
+    private void FixedUpdate()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
         
@@ -51,51 +51,51 @@ public class Enemy : MonoBehaviour
             Patrol();
         }
     }
-    
-    void Patrol()
+
+    private void Patrol()
     {
         if (waypoints.Length == 0) return;
     
-        Transform targetWaypoint = waypoints[currentWaypointIndex];
+        Transform targetWaypoint = waypoints[_currentWaypointIndex];
         Vector2 moveDirection = (targetWaypoint.position - transform.position).normalized;
         rb.linearVelocity = moveDirection * patrolSpeed;
     
         float distance = Vector2.Distance(transform.position, targetWaypoint.position);
         if (distance < waypointReachDistance)
         {
-            currentWaypointIndex += direction;
+            _currentWaypointIndex += _direction;
         
             // Reverse direction at endpoints
-            if (currentWaypointIndex >= waypoints.Length || currentWaypointIndex < 0)
+            if (_currentWaypointIndex >= waypoints.Length || _currentWaypointIndex < 0)
             {
-                direction *= -1;
-                currentWaypointIndex += direction;
+                _direction *= -1;
+                _currentWaypointIndex += _direction;
             }
         }
     }
-    
-    void ChasePlayer()
+
+    private void ChasePlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
         rb.linearVelocity = direction * chaseSpeed;
     }
-    
-    void RepelFromPlayer()
+
+    private void RepelFromPlayer()
     {
         Vector2 direction = (transform.position - player.position).normalized;
         rb.linearVelocity = direction * repelSpeed;
     }
-    
-    void OnCollisionStay2D(Collision2D collision)
+
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             // Damage player on cooldown
-            if (Time.time >= lastDamageTime + damageCooldown)
+            if (Time.time >= _lastDamageTime + damageCooldown)
             {
                 // TODO: Call player's TakeDamage method
                 Debug.Log($"Enemy dealt {damageAmount} damage to player!");
-                lastDamageTime = Time.time;
+                _lastDamageTime = Time.time;
             }
         }
     }

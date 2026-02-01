@@ -8,14 +8,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 lastMoveInput;
     private Transform spotLight;
     
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         spotLight = transform.Find("Light 2D");
         lastMoveInput = Vector2.right;
     }
 
-    void Update()
+    private void Update()
     {
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         rb.linearVelocity = moveInput.normalized * moveSpeed;
     }
