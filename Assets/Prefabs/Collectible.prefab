@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1637307361241365452}
   - component: {fileID: 8845004365968955789}
   - component: {fileID: 8583989579113517625}
-  - component: {fileID: 3693480105877667705}
   m_Layer: 0
   m_Name: Collectible
   m_TagString: Untagged
@@ -138,18 +137,3 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
---- !u!114 &3693480105877667705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3536472232479870810}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3951526dcfeb7b498146c8ca2327600, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioClip: {fileID: 8300000, guid: 893511121404c694c9c9ee275fdb3f9f, type: 3}
-  maxDistance: 10
-  maxVolume: 1
