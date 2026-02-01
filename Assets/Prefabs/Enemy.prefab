@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3535816897980884253}
   - component: {fileID: 6281076815353450263}
   - component: {fileID: 9100980688259481326}
+  - component: {fileID: 1675102609591704107}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -177,3 +178,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1675102609591704107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9134984799046390262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3951526dcfeb7b498146c8ca2327600, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: 9e5e2fc3e142cfa43be0cc6998f931b4, type: 3}
+  maxDistance: 10
+  maxVolume: 1
