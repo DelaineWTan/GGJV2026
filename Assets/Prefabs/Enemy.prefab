@@ -144,12 +144,11 @@ MonoBehaviour:
   - {fileID: 0}
   patrolSpeed: 10
   waypointReachDistance: 0.1
-  detectionRange: 5
-  chaseSpeed: 3
-  repelSpeed: 3
+  detectionRange: 10
+  chaseSpeed: 10
+  repelSpeed: 10
   damageAmount: 1
   damageCooldown: 1
-  currentBehavior: 0
 --- !u!50 &9100980688259481326
 Rigidbody2D:
   serializedVersion: 5

@@ -16,38 +16,45 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int damageAmount = 1;
     [SerializeField] private float damageCooldown = 1f;
     
-    private Transform player;
-    private Rigidbody2D rb;
+    private Transform _player;
+    private Rigidbody2D _rb;
     private int _currentWaypointIndex = 0;
-    private int _direction = 1; // 1 = forward, -1 = backward
+    private int _direction = 1;
     private float _lastDamageTime;
     
-    // Behavior states - set by player's mask system
-    public enum BehaviorState { Patrol, Chase, Repel }
-    public BehaviorState currentBehavior = BehaviorState.Patrol;
+    // Behavior states - controlled by SensorySystem
+    public enum BehaviorState { Neutral, Chase, Repel }
+    private BehaviorState _currentBehavior = BehaviorState.Neutral;
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        _rb = GetComponent<Rigidbody2D>();
+        _player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void FixedUpdate()
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
         
-        // Check if player is in range
+        // Only react to chase/repel if player is in range
         if (distanceToPlayer <= detectionRange)
         {
-            if (currentBehavior == BehaviorState.Chase)
-                ChasePlayer();
-            else if (currentBehavior == BehaviorState.Repel)
-                RepelFromPlayer();
-            else
-                Patrol(); // Stay on patrol even if in range
+            switch (_currentBehavior)
+            {
+                case BehaviorState.Neutral:
+                    Patrol(); // Still patrol even when close
+                    break;
+                case BehaviorState.Chase:
+                    ChasePlayer(); // Attracted to player
+                    break;
+                case BehaviorState.Repel:
+                    RepelFromPlayer(); // Flee from player
+                    break;
+            }
         }
         else
         {
+            // Out of range - always patrol regardless of behavior state
             Patrol();
         }
     }
@@ -58,14 +65,13 @@ public class Enemy : MonoBehaviour
     
         Transform targetWaypoint = waypoints[_currentWaypointIndex];
         Vector2 moveDirection = (targetWaypoint.position - transform.position).normalized;
-        rb.linearVelocity = moveDirection * patrolSpeed;
+        _rb.linearVelocity = moveDirection * patrolSpeed;
     
         float distance = Vector2.Distance(transform.position, targetWaypoint.position);
         if (distance < waypointReachDistance)
         {
             _currentWaypointIndex += _direction;
         
-            // Reverse direction at endpoints
             if (_currentWaypointIndex >= waypoints.Length || _currentWaypointIndex < 0)
             {
                 _direction *= -1;
@@ -76,39 +82,36 @@ public class Enemy : MonoBehaviour
 
     private void ChasePlayer()
     {
-        Vector2 direction = (player.position - transform.position).normalized;
-        rb.linearVelocity = direction * chaseSpeed;
+        Vector2 direction = (_player.position - transform.position).normalized;
+        _rb.linearVelocity = direction * chaseSpeed;
     }
 
     private void RepelFromPlayer()
     {
-        Vector2 direction = (transform.position - player.position).normalized;
-        rb.linearVelocity = direction * repelSpeed;
+        Vector2 direction = (transform.position - _player.position).normalized;
+        _rb.linearVelocity = direction * repelSpeed;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Damage player on cooldown
             if (Time.time >= _lastDamageTime + damageCooldown)
             {
-                // TODO: Call player's TakeDamage method
                 Debug.Log($"Enemy dealt {damageAmount} damage to player!");
                 _lastDamageTime = Time.time;
             }
         }
     }
     
-    // Call this from your mask/player system
+    // Called by SensorySystem
     public void SetBehavior(BehaviorState newBehavior)
     {
-        currentBehavior = newBehavior;
+        _currentBehavior = newBehavior;
     }
-    
-    void OnDrawGizmosSelected()
+
+    private void OnDrawGizmosSelected()
     {
-        // Visualize detection range in editor
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
