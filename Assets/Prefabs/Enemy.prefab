@@ -141,12 +141,11 @@ MonoBehaviour:
   waypoints:
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  patrolSpeed: 10
+  patrolSpeed: 6
   waypointReachDistance: 0.1
   detectionRange: 10
-  chaseSpeed: 10
-  repelSpeed: 10
+  chaseSpeed: 8
+  repelSpeed: 12
   damageAmount: 1
   damageCooldown: 1
 --- !u!50 &9100980688259481326

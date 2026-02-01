@@ -51,7 +51,7 @@ public class FruitPickup : MonoBehaviour
             // Check if this position overlaps with any obstacles
             Collider2D hit = Physics2D.OverlapCircle(testPosition, checkRadius, obstacleLayer);
             
-            if (hit == null)
+            if (!hit)
             {
                 validPosition = testPosition;
                 foundValidSpot = true;
