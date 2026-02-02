@@ -11,29 +11,42 @@ public class FruitPickup : MonoBehaviour
     [Header("Spawn SFX")] 
     [SerializeField] private AudioClip spawnSound;
     
+    [Header("Pulse Effect")]
+    [SerializeField] private float minScale = 0.9f;
+    [SerializeField] private float maxScale = 1.1f;
+    [SerializeField] private float pulseSpeed = 2f;
+    
     private Transform _player;
     private SpriteRenderer _spriteRenderer;
     private Collider2D _col;
     private float _nextSpawnTime;
+    private Vector3 _baseScale;
 
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").transform;
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _col = GetComponent<Collider2D>();
+        _baseScale = transform.localScale;
         
-        // First spawn immediately
         SpawnNearPlayer();
         _nextSpawnTime = Time.time + spawnInterval;
     }
 
     private void Update()
     {
-        // Respawn every interval regardless of pickup
         if (Time.time >= _nextSpawnTime)
         {
             SpawnNearPlayer();
             _nextSpawnTime = Time.time + spawnInterval;
+        }
+        
+        // Pulse the scale
+        if (_spriteRenderer.enabled)
+        {
+            float scale = Mathf.Lerp(minScale, maxScale, 
+                (Mathf.Sin(Time.time * pulseSpeed) + 1f) / 2f);
+            transform.localScale = _baseScale * scale;
         }
     }
 
@@ -42,13 +55,11 @@ public class FruitPickup : MonoBehaviour
         Vector3 validPosition = Vector3.zero;
         bool foundValidSpot = false;
         
-        // Keep trying until we find a valid spawn position
         while (!foundValidSpot)
         {
             Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
             Vector3 testPosition = _player.position + new Vector3(randomOffset.x, randomOffset.y, 0);
             
-            // Check if this position overlaps with any obstacles
             Collider2D hit = Physics2D.OverlapCircle(testPosition, checkRadius, obstacleLayer);
             
             if (!hit)
@@ -59,8 +70,6 @@ public class FruitPickup : MonoBehaviour
         }
         
         transform.position = validPosition;
-        
-        // Enable the fruit
         _spriteRenderer.enabled = true;
         _col.enabled = true;
         
@@ -71,13 +80,12 @@ public class FruitPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Roll the good die
             SensorySystem sensorySystem = GameManager.Instance.GetComponent<SensorySystem>();
             sensorySystem.RollGoodDie();
             
-            // Hide the fruit (will respawn on next interval)
             _spriteRenderer.enabled = false;
             _col.enabled = false;
+            transform.localScale = _baseScale; // Reset scale
         }
     }
 }

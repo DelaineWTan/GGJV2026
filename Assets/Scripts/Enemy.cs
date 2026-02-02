@@ -18,45 +18,53 @@ public class Enemy : MonoBehaviour
     
     private Transform _player;
     private Rigidbody2D _rb;
+    private SpriteRenderer _spriteRenderer; // ADD THIS
     private int _currentWaypointIndex = 0;
     private int _direction = 1;
     private float _lastDamageTime;
+    private bool _isFrozen = false;
     
-    // Behavior states - controlled by SensorySystem
     public enum BehaviorState { Neutral, Chase, Repel }
     private BehaviorState _currentBehavior = BehaviorState.Neutral;
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>(); // ADD THIS
         _player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void FixedUpdate()
     {
+        if (_isFrozen)
+        {
+            _rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        
         float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
         
-        // Only react to chase/repel if player is in range
         if (distanceToPlayer <= detectionRange)
         {
             switch (_currentBehavior)
             {
                 case BehaviorState.Neutral:
-                    Patrol(); // Still patrol even when close
+                    Patrol();
                     break;
                 case BehaviorState.Chase:
-                    ChasePlayer(); // Attracted to player
+                    ChasePlayer();
                     break;
                 case BehaviorState.Repel:
-                    RepelFromPlayer(); // Flee from player
+                    RepelFromPlayer();
                     break;
             }
         }
         else
         {
-            // Out of range - always patrol regardless of behavior state
             Patrol();
         }
+        
+        FlipSprite();
     }
 
     private void Patrol()
@@ -92,19 +100,29 @@ public class Enemy : MonoBehaviour
         _rb.linearVelocity = direction * repelSpeed;
     }
 
+    private void FlipSprite()
+    {
+        if (!_spriteRenderer) return;
+    
+        // Flip based on velocity direction
+        if (_rb.linearVelocity.x > 0.01f)
+            _spriteRenderer.flipX = true;  // Moving right
+        else if (_rb.linearVelocity.x < -0.01f)
+            _spriteRenderer.flipX = false; // Moving left
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             if (Time.time >= _lastDamageTime + damageCooldown)
             {
-                Debug.Log($"Enemy dealt {damageAmount} damage to player!");
+                GameManager.Instance?.TakeDamage(damageAmount);
                 _lastDamageTime = Time.time;
             }
         }
     }
     
-    // Called by SensorySystem
     public void SetBehavior(BehaviorState newBehavior)
     {
         _currentBehavior = newBehavior;
@@ -115,4 +133,10 @@ public class Enemy : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
+    
+    public void SetFrozen(bool frozen)
+    {
+        _isFrozen = frozen;
+    }
+
 }

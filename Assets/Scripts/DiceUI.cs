@@ -30,7 +30,7 @@ public class DiceUI : MonoBehaviour
         UpdateDiceDisplay(_sensorySystem.goodDieState, _sensorySystem.badDieState);
     }
 
-    private void UpdateDiceDisplay(SensorySystem.SenseType goodDie, SensorySystem.SenseType badDie)
+    public void UpdateDiceDisplay(SensorySystem.SenseType goodDie, SensorySystem.SenseType badDie)
     {
         // Update good die image
         goodDieImage.sprite = goodDie switch
